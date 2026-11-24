@@ -1,8 +1,10 @@
+```blade
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>@yield('title', 'RAPI Sekolah')</title>
 
     <!-- Bootstrap 5 & Icons -->
@@ -12,47 +14,67 @@
     <!-- CSS Eksternal -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-    <style>
-        /* Efek geser halus (smooth scroll) ala landing page */
-        html {
-            scroll-behavior: smooth;
-        }
-    </style>
-
     @stack('styles')
 </head>
-<body class="bg-light">
+
+<body class="public-body">
 
     <!-- Navbar Publik -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <nav class="navbar navbar-expand-lg public-navbar sticky-top">
         <div class="container py-2">
-            <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="{{ url('/') }}">
-                <i class="bi bi-building-fill-gear fs-4"></i>
-                RAPI Sekolah
+
+            <a class="navbar-brand public-brand d-flex align-items-center gap-3"
+               href="{{ url('/') }}">
+
+                <img src="{{ asset('images/logo-smkn1-bantul.png') }}"
+                     alt="Logo SMKN 1 Bantul"
+                     class="public-logo">
+
+                <div class="d-flex flex-column">
+                    <span class="brand-title">RAPI Sekolah</span>
+                    <small class="brand-subtitle">SMK Negeri 1 Bantul</small>
+                </div>
             </a>
-            <div>
+
+            <div class="ms-auto">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm px-4">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" class="btn btn-school">
+                        Dashboard
+                    </a>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-4">Login</a>
+                    <a href="{{ route('login') }}" class="btn btn-school">
+                        Login
+                    </a>
                 @endauth
             </div>
+
         </div>
     </nav>
 
     <!-- Konten Utama -->
-    <main class="py-4">
+    <main class="public-main">
         @yield('content')
     </main>
 
-    <!-- Footer Sederhana -->
-    <footer class="text-center py-4 text-muted small border-top bg-white mt-5">
-        <div class="container">
-            &copy; {{ date('Y') }} RAPI Sekolah. Sistem Informasi Manajemen Sarana Prasarana.
+    <!-- Footer -->
+    <footer class="public-footer">
+        <div class="container text-center">
+            <p class="mb-1">
+                &copy; {{ date('Y') }} RAPI Sekolah
+            </p>
+            <small>
+                Sistem Informasi Manajemen Sarana dan Prasarana
+                <br>
+                SMK Negeri 1 Bantul
+            </small>
         </div>
     </footer>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     @stack('scripts')
+
 </body>
 </html>
+```

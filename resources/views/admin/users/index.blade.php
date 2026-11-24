@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 
 @section('title', 'Kelola Pengguna - RAPI Sekolah')
@@ -81,6 +82,7 @@
                             <th>No.</th>
                             <th>Username</th>
                             <th>Nama Lengkap</th>
+                            <th>Email</th>
                             <th>No. Telepon</th>
                             <th>Role</th>
                             <th class="text-center">Aksi</th>
@@ -97,6 +99,10 @@
                                 <td>{{ $user->username }}</td>
 
                                 <td>{{ $user->fullname }}</td>
+
+                                <td>
+                                    {{ $user->email ?? '-' }}
+                                </td>
 
                                 <td>{{ $user->phone_number }}</td>
 
@@ -138,7 +144,7 @@
                         @empty
 
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-5">
+                                <td colspan="7" class="text-center text-muted py-5">
                                     <i class="bi bi-person-x fs-2 d-block mb-2"></i>
 
                                     Belum ada data pengguna.

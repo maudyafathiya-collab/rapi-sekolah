@@ -30,12 +30,15 @@
 <div class="app-wrapper">
 
     {{-- SIDEBAR --}}
-    <aside class="sidebar">
+    <aside class="sidebar" id="picSidebar">
 
         <div class="sidebar-brand">
-            <i class="bi bi-tools"></i>
-            RAPI Sekolah
-        </div>
+    <img src="{{ asset('images/logo-smkn1-bantul.png') }}"
+         alt="Logo SMKN 1 Bantul"
+         class="school-logo">
+
+    <span>RAPI Sekolah</span>
+</div>
 
         <nav class="sidebar-menu">
 
@@ -57,6 +60,12 @@
                 Pengaduan Saya
             </a>
 
+                <a href="{{ route('pic.rooms.index') }}"
+                class="nav-link {{ request()->routeIs('pic.rooms.*') ? 'active' : '' }}">
+                <i class="bi bi-door-open"></i>
+                Daftar Ruangan
+            </a>
+
         </nav>
 
         <div class="sidebar-footer">
@@ -74,18 +83,36 @@
 
     </aside>
 
+    {{-- OVERLAY SIDEBAR MOBILE --}}
+    <div class="sidebar-overlay" id="picOverlay"></div>
+
     {{-- KONTEN UTAMA --}}
     <main class="main-content">
 
         {{-- TOPBAR --}}
         <header class="topbar">
 
-            <div>
-                <h5 class="mb-0">@yield('page_title', 'Dashboard PIC')</h5>
+            <div class="d-flex align-items-center gap-3">
 
-                <small class="text-muted">
-                    @yield('page_subtitle', 'Panel pengelolaan sarana dan prasarana')
-                </small>
+                <button
+                    type="button"
+                    class="sidebar-toggle"
+                    id="picToggle"
+                    aria-label="Buka menu"
+                >
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div>
+                    <h5 class="mb-0">
+                        @yield('page_title', 'Dashboard PIC')
+                    </h5>
+
+                    <small class="text-muted">
+                        @yield('page_subtitle', 'Panel pengelolaan sarana dan prasarana')
+                    </small>
+                </div>
+
             </div>
 
             <div class="text-end">
@@ -100,9 +127,7 @@
 
         {{-- ISI HALAMAN --}}
         <div class="container-fluid p-4">
-
             @yield('content')
-
         </div>
 
     </main>
@@ -112,7 +137,50 @@
 {{-- Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-{{-- Script tambahan dari halaman --}}
+{{-- JAVASCRIPT SIDEBAR MOBILE --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('picSidebar');
+    const toggle = document.getElementById('picToggle');
+    const overlay = document.getElementById('picOverlay');
+
+    if (!sidebar || !toggle || !overlay) return;
+
+    function openSidebar() {
+        sidebar.classList.add('show');
+        overlay.classList.add('show');
+        document.body.classList.add('sidebar-open');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+        document.body.classList.remove('sidebar-open');
+    }
+
+    toggle.addEventListener('click', function () {
+        if (sidebar.classList.contains('show')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
+
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+
+    sidebar.querySelectorAll('.nav-link').forEach(function (link) {
+        link.addEventListener('click', closeSidebar);
+    });
+
+});
+</script>
 
 @stack('scripts')
 

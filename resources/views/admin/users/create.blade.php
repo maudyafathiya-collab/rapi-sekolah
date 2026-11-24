@@ -85,6 +85,30 @@
                 @enderror
             </div>
 
+            {{-- Email --}}
+<div class="mb-3">
+    <label for="email" class="form-label fw-semibold">
+        Email
+    </label>
+
+    <input
+        type="email"
+        id="email"
+        name="email"
+        class="form-control @error('email') is-invalid @enderror"
+        value="{{ old('email') }}"
+        placeholder="Masukkan alamat email"
+    >
+
+    @error('email')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+
+    <small class="text-muted">
+        Email digunakan untuk pemulihan password jika pengguna lupa password.
+    </small>
+</div>
+
             {{-- Nomor Telepon --}}
             <div class="mb-3">
                 <label for="phone_number" class="form-label fw-semibold">

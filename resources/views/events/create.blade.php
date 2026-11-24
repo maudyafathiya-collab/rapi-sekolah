@@ -41,7 +41,7 @@
             <div class="mb-3">
                 <label class="form-label fw-semibold">Ruangan</label>
 
-                <select name="room_id"
+                <select name="room_id" id="room_id"
                     class="form-select @error('room_id') is-invalid @enderror"
                     required>
 
@@ -65,24 +65,27 @@
             <div class="mb-3">
                 <label class="form-label fw-semibold">Tanggal Kegiatan</label>
 
-                <input type="date" name="date"
+                <input type="text" name="date" id="date"
                     class="form-control @error('date') is-invalid @enderror"
                     value="{{ old('date') }}"
-                    min="{{ date('Y-m-d') }}" required>
+                    placeholder="DD/MM/YYYY"
+                    autocomplete="off"
+                    required>
 
                 @error('date')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
-            {{-- JAM KEGIATAN --}}
+            {{-- JAM PEMINJAMAN --}}
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-semibold">Jam Mulai</label>
 
-                    <input type="time" name="start_time"
+                    <input type="time" name="start_time" id="start_time"
                         class="form-control @error('start_time') is-invalid @enderror"
-                        value="{{ old('start_time') }}" required>
+                        value="{{ old('start_time') }}"
+                        required>
 
                     @error('start_time')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -92,9 +95,10 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-semibold">Jam Selesai</label>
 
-                    <input type="time" name="end_time"
+                    <input type="time" name="end_time" id="end_time"
                         class="form-control @error('end_time') is-invalid @enderror"
-                        value="{{ old('end_time') }}" required>
+                        value="{{ old('end_time') }}"
+                        required>
 
                     @error('end_time')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -199,6 +203,37 @@
 @endsection
 
 @push('scripts')
+
+{{-- LIBRARY FLATPICKR --}}
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+
+{{-- PENGATURAN TANGGAL INDONESIA --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const dateInput = document.getElementById('date');
+
+    flatpickr(dateInput, {
+        locale: 'id',
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'd/m/Y',
+        minDate: '{{ now()->addDay()->toDateString() }}',
+        disableMobile: true,
+
+        onChange: function () {
+            dateInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+});
+</script>
+
+{{-- JAVASCRIPT KAMERA --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -229,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
         takeButton.disabled = true;
     }
 
-    // Membersihkan preview foto sebelumnya.
+    // Membersihkan preview foto.
     function clearPreview() {
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
@@ -341,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
         startButton.click();
     });
 
-    // Jika user memilih file dari perangkat.
+    // Jika pengguna memilih file dari perangkat.
     input.addEventListener('change', function () {
 
         stopCamera();
@@ -376,4 +411,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
+
 @endpush

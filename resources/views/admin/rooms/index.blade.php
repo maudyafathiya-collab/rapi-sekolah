@@ -1,3 +1,4 @@
+
 @php
     $layout = 'layouts.public';
 
@@ -50,6 +51,7 @@
                             <th>Nama Ruangan</th>
                             <th>Kapasitas</th>
                             <th>Lokasi</th>
+                            <th>PIC Penanggung Jawab</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -59,9 +61,23 @@
                         @forelse($rooms as $room)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+
                                 <td>{{ $room->room_name }}</td>
+
                                 <td>{{ $room->capacity }}</td>
+
                                 <td>{{ $room->location }}</td>
+
+                                <td>
+                                    @if($room->pic)
+                                        {{ $room->pic->fullname }}
+                                    @else
+                                        <span class="text-muted">
+                                            Belum ditentukan
+                                        </span>
+                                    @endif
+                                </td>
+
                                 <td>
                                     @if($room->is_active)
                                         <span class="badge bg-success">Aktif</span>
@@ -69,6 +85,7 @@
                                         <span class="badge bg-secondary">Tidak Aktif</span>
                                     @endif
                                 </td>
+
                                 <td>
                                     <a href="{{ route('rooms.edit', $room->id) }}"
                                        class="btn btn-warning btn-sm">
@@ -81,6 +98,7 @@
                                           onsubmit="return confirm('Yakin ingin menghapus ruangan ini?')">
                                         @csrf
                                         @method('DELETE')
+
                                         <button type="submit" class="btn btn-danger btn-sm">
                                             Hapus
                                         </button>

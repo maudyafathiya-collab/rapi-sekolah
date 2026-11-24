@@ -6,31 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAPI Sekolah</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
-
-    <!-- CSS External -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 
 <body>
 
-    <!-- TOPBAR GENERAL -->
     <header class="public-topbar shadow-sm">
         <a href="{{ route('public.dashboard') }}" class="brand-logo">
             <i class="bi bi-building-fill-gear"></i>
             RAPI Sekolah
         </a>
-
     </header>
 
-    <!-- KONTEN UTAMA -->
     <main class="container public-main py-4">
 
         <!-- WELCOME BANNER -->
@@ -51,11 +41,9 @@
         <!-- FITUR UTAMA -->
         <div class="row g-3 mb-4">
 
-            <!-- KARTU KALENDER -->
             <div class="col-md-6">
                 <div class="card h-100 p-2">
                     <div class="card-body d-flex flex-column justify-content-between">
-
                         <div>
                             <div class="public-stat-icon mb-3">
                                 <i class="bi bi-calendar-event"></i>
@@ -79,16 +67,13 @@
                             Buka Kalender Agenda
                             <i class="bi bi-arrow-right"></i>
                         </button>
-
                     </div>
                 </div>
             </div>
 
-            <!-- KARTU LOGIN -->
             <div class="col-md-6">
                 <div class="card h-100 p-2">
                     <div class="card-body d-flex flex-column justify-content-between">
-
                         <div>
                             <div class="public-stat-icon mb-3">
                                 <i class="bi bi-shield-lock"></i>
@@ -109,130 +94,399 @@
                             Masuk ke Akun
                             <i class="bi bi-box-arrow-in-right"></i>
                         </a>
-
                     </div>
                 </div>
             </div>
 
         </div>
+    
+<!-- KALENDER PUBLIC -->
+<div id="calendar-section" class="pt-3">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 calendar-card-body">
 
-        <!-- KALENDER PUBLIK -->
-        <div class="card border-0 shadow-sm mt-4" id="calendar-section">
-            <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 calendar-section-heading">
+                <h4 class="fw-bold mb-0">Kalender Agenda Sekolah</h4>
+                <span class="text-muted small">
+                    Jadwal kegiatan dan peminjaman ruangan
+                </span>
+            </div>
 
-                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-                    <div>
-                        <h5 class="fw-bold mb-1">
-                            Kalender Agenda Sekolah
-                        </h5>
+            <!-- Kalender bulanan -->
+            <div id="public-calendar"></div>
+
+            <!-- Filter agenda -->
+            <div class="calendar-agenda-filter mt-4">
+                <h5 class="fw-bold mb-3">Daftar Agenda Sekolah</h5>
+
+                <div class="row g-3 mb-3">
+
+                    <div class="col-12 col-md-4">
+                        <label for="publicAgendaFilterType" class="form-label">
+                            Tampilkan agenda
+                        </label>
+
+                        <select id="publicAgendaFilterType" class="form-select">
+                            <option value="month">Per Bulan</option>
+                            <option value="day">Per Hari</option>
+                        </select>
                     </div>
+
+                    <div class="col-12 col-md-4" id="publicAgendaMonthWrapper">
+                        <label for="publicAgendaMonth" class="form-label">
+                            Pilih Bulan
+                        </label>
+
+                        <input type="month" id="publicAgendaMonth" class="form-control">
+                    </div>
+
+                    <div class="col-12 col-md-4" id="publicAgendaDateWrapper" hidden>
+                        <label for="publicAgendaDate" class="form-label">
+                            Pilih Tanggal
+                        </label>
+
+                        <input type="date" id="publicAgendaDate" class="form-control">
+                    </div>
+
                 </div>
 
-                <!-- Tempat FullCalendar -->
-                <div id="public-calendar"></div>
-
+                <div id="publicAgendaResults" class="calendar-agenda-results">
+                    <p class="text-muted mb-0">Memuat agenda...</p>
+                </div>
             </div>
+
         </div>
+    </div>
+</div>
+
 
     </main>
 
-    <!-- FullCalendar JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-
     
-<!-- Kalender Publik -->
+<!-- FullCalendar JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const calendarElement = document.getElementById('public-calendar');
+document.addEventListener('DOMContentLoaded', function () {
 
-        if (!calendarElement) return;
+    const calendarEl = document.getElementById('public-calendar');
 
-        fetch("{{ route('calendar.holidays') }}")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Gagal mengambil data libur');
-                }
-                return response.json();
-            })
-            .then(holidays => {
-                const holidayMap = {};
+    if (!calendarEl) return;
 
-                holidays.forEach(holiday => {
-                    holidayMap[holiday.date] = holiday;
-                });
+    const filterType = document.getElementById('publicAgendaFilterType');
+    const monthInput = document.getElementById('publicAgendaMonth');
+    const dateInput = document.getElementById('publicAgendaDate');
+    const monthWrapper = document.getElementById('publicAgendaMonthWrapper');
+    const dateWrapper = document.getElementById('publicAgendaDateWrapper');
+    const agendaResults = document.getElementById('publicAgendaResults');
 
-                const calendar = new FullCalendar.Calendar(calendarElement, {
-                    initialView: 'dayGridMonth',
-                    locale: 'id',
-                    height: 'auto',
+    let calendar = null;
 
-                    events: "{{ route('calendar.events') }}",
+    function dateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
 
-                    dayCellDidMount: function (info) {
-                        const date = info.el.getAttribute('data-date');
-                        const day = info.date.getDay();
-                        const holiday = holidayMap[date];
+        return `${year}-${month}-${day}`;
+    }
 
-                        // Sabtu, Minggu, dan hari libur berwarna merah
-                        if (day === 0 || day === 6 || holiday) {
-                            info.el.style.backgroundColor = '#fee2e2';
-                        }
+    function formatDate(dateString) {
+        const date = new Date(dateString + 'T00:00:00');
 
-                        const dayNumber = info.el.querySelector('.fc-daygrid-day-number');
+        return date.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
 
-                        if (dayNumber) {
-                            dayNumber.style.color =
-                                (day === 0 || day === 6 || holiday)
-                                    ? '#b91c1c'
-                                    : '#1f2937';
+    // Membuat titik hijau pada tanggal yang memiliki agenda.
+    function updateAgendaMarkers() {
+        if (!calendar) return;
 
-                            dayNumber.style.fontWeight = '700';
-                        }
-                    },
+        calendarEl.querySelectorAll('.calendar-agenda-marker').forEach(function (marker) {
+            marker.remove();
+        });
 
-                    dateClick: function (info) {
-                        const holiday = holidayMap[info.dateStr];
+        const datesWithEvents = new Set();
 
-                        if (holiday) {
-                            alert(
-                                'Tanggal: ' + info.dateStr +
-                                '\nNama: ' + holiday.name +
-                                '\nJenis: ' + (
-                                    holiday.type === 'collective'
-                                        ? 'Cuti Bersama'
-                                        : 'Libur Nasional'
-                                )
-                            );
-                        }
-                    },
+        calendar.getEvents().forEach(function (event) {
+            if (!event.start) return;
 
-                    eventClick: function (info) {
-                        alert(
-                            'Agenda: ' + info.event.title +
-                            '\nRuangan: ' + (info.event.extendedProps.room ?? '-') +
-                            '\nStatus: ' + (info.event.extendedProps.status ?? '-')
-                        );
-                    }
-                });
+            datesWithEvents.add(dateKey(event.start));
+        });
 
-                calendar.render();
-            })
-            .catch(error => {
-                console.error(error);
-                alert('Data hari libur gagal dimuat.');
+        datesWithEvents.forEach(function (date) {
+            const dayCell = calendarEl.querySelector(
+                `.fc-daygrid-day[data-date="${date}"]`
+            );
 
-                // Tetap tampilkan kalender jika data libur gagal dimuat
-                const calendar = new FullCalendar.Calendar(calendarElement, {
-                    initialView: 'dayGridMonth',
-                    locale: 'id',
-                    firstDay: 1,
-                    height: 'auto',
-                    events: "{{ route('calendar.events') }}"
-                });
+            if (!dayCell) return;
 
-                calendar.render();
+            const dayFrame = dayCell.querySelector('.fc-daygrid-day-frame');
+
+            if (!dayFrame) return;
+
+            const marker = document.createElement('span');
+
+            marker.className = 'calendar-agenda-marker';
+            marker.title = 'Ada agenda pada tanggal ini';
+            marker.setAttribute('aria-label', 'Ada agenda');
+
+            dayFrame.appendChild(marker);
+        });
+    }
+
+    // Menampilkan agenda sesuai pilihan filter.
+    function renderAgenda() {
+        if (!calendar) return;
+
+        const selectedType = filterType.value;
+        const selectedMonth = monthInput.value;
+        const selectedDate = dateInput.value;
+
+        const filteredEvents = calendar.getEvents().filter(function (event) {
+            if (!event.start) return false;
+
+            const eventDate = dateKey(event.start);
+
+            if (selectedType === 'day') {
+                return eventDate === selectedDate;
+            }
+
+            return eventDate.substring(0, 7) === selectedMonth;
+        });
+
+        filteredEvents.sort(function (a, b) {
+            return a.start - b.start;
+        });
+
+        agendaResults.innerHTML = '';
+
+        if (filteredEvents.length === 0) {
+            const emptyMessage = document.createElement('p');
+
+            emptyMessage.className = 'text-muted mb-0';
+            emptyMessage.textContent = 'Tidak ada agenda pada periode yang dipilih.';
+
+            agendaResults.appendChild(emptyMessage);
+            return;
+        }
+
+        filteredEvents.forEach(function (event) {
+            const item = document.createElement('div');
+            item.className = 'calendar-agenda-item';
+
+            const title = document.createElement('strong');
+            title.textContent = event.title;
+
+            const date = document.createElement('div');
+            date.className = 'small text-muted mt-1';
+            date.textContent = formatDate(dateKey(event.start));
+
+            const time = document.createElement('div');
+            time.className = 'small mt-1';
+
+            const startTime = event.start.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit'
             });
+
+            const endTime = event.end
+                ? event.end.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+                : '';
+
+            time.textContent = endTime
+                ? `${startTime} - ${endTime}`
+                : startTime;
+
+            const room = document.createElement('div');
+            room.className = 'small mt-1';
+            room.textContent = 'Ruangan: ' +
+                (event.extendedProps.room ?? '-');
+
+            const status = document.createElement('div');
+            status.className = 'small text-muted mt-1';
+            status.textContent = 'Status: ' +
+                (event.extendedProps.status ?? '-');
+
+            item.append(title, date, time, room, status);
+            agendaResults.appendChild(item);
+        });
+    }
+
+    function updateFilterDisplay() {
+        const isDay = filterType.value === 'day';
+
+        monthWrapper.hidden = isDay;
+        dateWrapper.hidden = !isDay;
+
+        renderAgenda();
+    }
+
+    // Membuat kalender public dengan konfigurasi sama seperti kalender role.
+    function createCalendar(holidays) {
+
+        const holidayMap = {};
+
+        holidays.forEach(function (holiday) {
+            holidayMap[holiday.date] = holiday;
+        });
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+
+            initialView: 'dayGridMonth',
+            locale: 'id',
+            firstDay: 0,
+            height: 'auto',
+            contentHeight: 'auto',
+            expandRows: true,
+            fixedWeekCount: false,
+
+            headerToolbar: {
+                left: 'title',
+                center: '',
+                right: 'today prev,next'
+            },
+
+            buttonText: {
+                today: 'Hari ini'
+            },
+
+            events: "{{ route('calendar.events') }}",
+
+            // Agenda ditampilkan sebagai titik, bukan teks di kotak tanggal.
+            eventContent: function () {
+                return {
+                    html: ''
+                };
+            },
+
+            eventsSet: function () {
+                updateAgendaMarkers();
+                renderAgenda();
+            },
+
+            datesSet: function (info) {
+                const currentMonth = dateKey(info.view.currentStart).substring(0, 7);
+
+                monthInput.value = currentMonth;
+
+                updateAgendaMarkers();
+
+                if (filterType.value === 'month') {
+                    renderAgenda();
+                }
+            },
+
+            dayCellDidMount: function (info) {
+                const date = info.el.getAttribute('data-date');
+                const day = info.date.getDay();
+                const holiday = holidayMap[date];
+
+                if (day === 0 || day === 6 || holiday) {
+                    info.el.style.backgroundColor = '#fee2e2';
+                }
+
+                const dayNumber = info.el.querySelector('.fc-daygrid-day-number');
+
+                if (dayNumber) {
+                    dayNumber.style.color =
+                        (day === 0 || day === 6 || holiday)
+                            ? '#b91c1c'
+                            : '#1f2937';
+
+                    dayNumber.style.fontWeight = '700';
+                }
+            },
+
+            dateClick: function (info) {
+                filterType.value = 'day';
+                dateInput.value = info.dateStr;
+
+                updateFilterDisplay();
+
+                const holiday = holidayMap[info.dateStr];
+
+                if (holiday) {
+                    const jenis = holiday.type === 'collective'
+                        ? 'Cuti Bersama'
+                        : 'Libur Nasional';
+
+                    alert(
+                        'Tanggal: ' + info.dateStr +
+                        '\nNama: ' + holiday.name +
+                        '\nJenis: ' + jenis
+                    );
+                }
+            },
+
+            eventClick: function (info) {
+                alert(
+                    'Agenda: ' + info.event.title +
+                    '\nRuangan: ' + (info.event.extendedProps.room ?? '-') +
+                    '\nStatus: ' + (info.event.extendedProps.status ?? '-')
+                );
+            }
+        });
+
+        calendar.render();
+
+        const today = dateKey(new Date());
+        dateInput.value = today;
+
+        window.addEventListener('resize', function () {
+            calendar.updateSize();
+        });
+    }
+
+    // Filter Per Hari atau Per Bulan.
+    filterType.addEventListener('change', function () {
+        updateFilterDisplay();
     });
+
+    // Saat bulan dipilih, kalender ikut berpindah bulan.
+    monthInput.addEventListener('change', function () {
+        if (!monthInput.value || !calendar) return;
+
+        calendar.gotoDate(monthInput.value + '-01');
+        renderAgenda();
+    });
+
+    // Saat tanggal dipilih, kalender ikut berpindah tanggal.
+    dateInput.addEventListener('change', function () {
+        if (dateInput.value && calendar) {
+            calendar.gotoDate(dateInput.value);
+        }
+
+        renderAgenda();
+    });
+
+    // Mengambil data hari libur.
+    fetch("{{ route('calendar.holidays') }}")
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Gagal mengambil data libur.');
+            }
+
+            return response.json();
+        })
+        .then(function (holidays) {
+            createCalendar(holidays);
+        })
+        .catch(function (error) {
+            console.error(error);
+
+            alert('Data hari libur gagal dimuat. Kalender agenda tetap ditampilkan.');
+
+            createCalendar([]);
+        });
+
+});
 </script>
 
 

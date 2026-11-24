@@ -1,4 +1,3 @@
-```blade
 @php
     $roleId = Auth::check() ? (int) Auth::user()->role_id : 0;
 
@@ -150,9 +149,26 @@
                                                     $phone = '62' . $phone;
                                                 }
                                             @endphp
+                                                                      
+                                            @php
+                                                // Buat pesan WhatsApp pengaduan
+                                                $message = "Halo Bapak/Ibu {$complaint->handler->fullname},\n\n"
+                                                    . "Kami ingin menginformasikan adanya pengaduan kerusakan fasilitas sekolah.\n\n"
+                                                    . "Detail Pengaduan:\n"
+                                                    . "Nama PIC: {$complaint->handler->fullname}\n"
+                                                    . "Ruangan: " . ($complaint->room->room_name ?? '-') . "\n"
+                                                    . "Nama Pelapor: " . ($complaint->reporter->fullname ?? '-') . "\n"
+                                                    . "Tanggal Pengaduan: " . $complaint->created_at->format('d-m-Y H:i') . "\n"
+                                                    . "Deskripsi Kerusakan: {$complaint->description}\n\n"
+                                                    . "Mohon segera dilakukan pengecekan dan penanganan terhadap pengaduan tersebut.\n\n"
+                                                    . "Terima kasih.\n"
+                                                    . "RAPI Sekolah";
+
+                                                $whatsappUrl = "https://wa.me/{$phone}?text=" . urlencode($message);
+                                            @endphp
 
                                             <a
-                                                href="https://api.whatsapp.com/send?phone={{ $phone }}"
+                                                href="{{ $whatsappUrl }}"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 class="btn btn-success btn-sm"
@@ -160,6 +176,7 @@
                                                 <i class="bi bi-whatsapp"></i>
                                                 Hubungi PIC
                                             </a>
+
 
                                         @else
                                             <span class="text-muted small">

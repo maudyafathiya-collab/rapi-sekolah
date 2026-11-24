@@ -36,6 +36,12 @@
                 <button type="submit" class="btn btn-primary w-100 mt-2">Masuk</button>
             </form>
         </div>
+        <div class="text-center mt-3">
+    <a href="{{ route('password.request') }}"
+       class="text-decoration-none small">
+        Lupa Password?
+    </a>
+</div>
     </div>
 
 </body>

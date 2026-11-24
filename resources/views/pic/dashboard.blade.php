@@ -7,29 +7,37 @@
 
 @section('content')
 
-    {{-- Sambutan --}}
-    <div class="mb-4">
-        <h4>Selamat Datang, {{ Auth::user()->fullname }}!</h4>
-        <p class="text-muted">
-            Berikut laporan kerusakan yang menjadi tanggung jawabmu.
+    {{-- BANNER SAMBUTAN --}}
+    <div class="bg-primary text-white rounded-3 p-4 mb-4 shadow-sm">
+        <h4 class="fw-bold mb-1">
+            Selamat Datang, {{ Auth::user()->fullname }}!
+        </h4>
+        <p class="mb-0">
+            Selamat datang di RAPI Sekolah. Kelola pengaduan kerusakan
+            dan pantau kondisi fasilitas sekolah melalui sistem ini.
         </p>
     </div>
 
-    {{-- Ringkasan pengaduan --}}
+    {{-- RINGKASAN PENGADUAN --}}
     <div class="row g-3 mb-4">
 
+        {{-- TOTAL LAPORAN --}}
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card stat-card h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="text-muted mb-1">Total Laporan</p>
-                            <h3 class="fw-bold mb-0">{{ $totalLaporan }}</h3>
+                            <h3 class="fw-bold mb-0">
+                                {{ $totalLaporan }}
+                            </h3>
                         </div>
+
                         <div class="stat-icon">
                             <i class="bi bi-clipboard-data"></i>
                         </div>
                     </div>
+
                     <small class="text-muted">
                         Pengaduan yang ditugaskan kepadamu
                     </small>
@@ -37,6 +45,7 @@
             </div>
         </div>
 
+        {{-- BELUM DIPERBAIKI --}}
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card stat-card h-100">
                 <div class="card-body">
@@ -47,6 +56,7 @@
                                 {{ $belumDiperbaiki }}
                             </h3>
                         </div>
+
                         <div class="stat-icon">
                             <i class="bi bi-exclamation-circle"></i>
                         </div>
@@ -55,6 +65,7 @@
             </div>
         </div>
 
+        {{-- MENUNGGU SPARE PART --}}
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card stat-card h-100">
                 <div class="card-body">
@@ -65,6 +76,7 @@
                                 {{ $menungguSparePart }}
                             </h3>
                         </div>
+
                         <div class="stat-icon">
                             <i class="bi bi-hourglass-split"></i>
                         </div>
@@ -73,6 +85,7 @@
             </div>
         </div>
 
+        {{-- SUDAH DIPERBAIKI --}}
         <div class="col-xl-3 col-md-6 col-12">
             <div class="card stat-card h-100">
                 <div class="card-body">
@@ -83,6 +96,7 @@
                                 {{ $sudahDiperbaiki }}
                             </h3>
                         </div>
+
                         <div class="stat-icon">
                             <i class="bi bi-check-circle"></i>
                         </div>
@@ -93,13 +107,14 @@
 
     </div>
 
-    {{-- Daftar pengaduan --}}
+    {{-- DAFTAR PENGADUAN --}}
     <div class="card border-0 shadow-sm">
 
-        <div class="card-body">
+        <div class="card-body p-4">
 
             <div class="mb-3">
-                <h5 class="mb-1">Daftar Pengaduan Saya</h5>
+                <h5 class="fw-bold mb-1">Daftar Pengaduan Saya</h5>
+
                 <p class="text-muted mb-0">
                     Laporan kerusakan yang perlu ditangani.
                 </p>
@@ -149,14 +164,17 @@
                                         <span class="badge bg-danger">
                                             Belum Diperbaiki
                                         </span>
+
                                     @elseif ($complaint->status_repair === 'Menunggu Spare Part')
                                         <span class="badge bg-warning text-dark">
                                             Menunggu Spare Part
                                         </span>
+
                                     @elseif ($complaint->status_repair === 'Sudah Diperbaiki')
                                         <span class="badge bg-success">
                                             Sudah Diperbaiki
                                         </span>
+
                                     @else
                                         <span class="badge bg-secondary">
                                             Belum Ada Status
@@ -180,6 +198,7 @@
                             <tr>
                                 <td colspan="7" class="text-center py-4">
                                     <i class="bi bi-clipboard-check fs-2 d-block mb-2 text-muted"></i>
+
                                     Belum ada pengaduan yang ditugaskan kepadamu.
                                 </td>
                             </tr>

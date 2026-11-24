@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
@@ -43,23 +45,24 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $this->authorizeAdmin();
+{
+    $this->authorizeAdmin();
 
-        $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:users,username',
-            'fullname' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
-            'role_id' => 'required|exists:roles,id',
-            'password' => 'required|string|min:6',
-        ]);
+    $validated = $request->validate([
+        'username' => 'required|string|max:255|unique:users,username',
+        'fullname' => 'required|string|max:255',
+        'email' => 'nullable|email|max:255|unique:users,email',
+        'phone_number' => 'required|string|max:20',
+        'role_id' => 'required|exists:roles,id',
+        'password' => 'required|string|min:6',
+    ]);
 
-        User::create($validated);
+    User::create($validated);
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Pengguna berhasil ditambahkan.');
-    }
+    return redirect()
+        ->route('users.index')
+        ->with('success', 'Pengguna berhasil ditambahkan.');
+}
 
     public function edit(User $user)
     {
@@ -71,42 +74,63 @@ class UserController extends Controller
     }
 
     public function update(Request $request, User $user)
-    {
-        $this->authorizeAdmin();
+{
+    $this->authorizeAdmin();
 
-        $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
-            'fullname' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
-            'role_id' => 'required|exists:roles,id',
-            'password' => 'nullable|string|min:6',
-        ]);
+    $validated = $request->validate([
+        'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+        'fullname' => 'required|string|max:255',
+        'email' => 'nullable|email|max:255|unique:users,email,' . $user->id,
+        'phone_number' => 'required|string|max:20',
+        'role_id' => 'required|exists:roles,id',
+        'password' => 'nullable|string|min:6',
+    ]);
 
-        if (empty($validated['password'])) {
-            unset($validated['password']);
-        }
-
-        $user->update($validated);
-
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Data pengguna berhasil diperbarui.');
+    if (empty($validated['password'])) {
+        unset($validated['password']);
     }
 
-    public function destroy(User $user)
-    {
-        $this->authorizeAdmin();
+    $user->update($validated);
 
-        if ((int) $user->id === (int) Auth::id()) {
+    return redirect()
+        ->route('users.index')
+        ->with('success', 'Data pengguna berhasil diperbarui.');
+}
+  
+public function destroy(User $user)
+{
+    $this->authorizeAdmin();
+
+    // Tidak boleh menghapus akun sendiri
+    if ((int) $user->id === (int) Auth::id()) {
+        return redirect()
+            ->route('users.index')
+            ->with('error', 'Akun yang sedang digunakan tidak dapat dihapus.');
+    }
+
+    // Admin dan Waka tidak boleh dihapus
+    if (in_array((int) $user->role_id, [1, 2], true)) {
+        return redirect()
+            ->route('users.index')
+            ->with('error', 'Akun Admin dan Waka tidak dapat dihapus.');
+    }
+
+    // PIC tidak boleh dihapus jika masih bertanggung jawab atas ruangan
+    if ((int) $user->role_id === 5) {
+        $hasRooms = Room::where('pic_id', $user->id)->exists();
+
+        if ($hasRooms) {
             return redirect()
                 ->route('users.index')
-                ->with('error', 'Akun yang sedang digunakan tidak dapat dihapus.');
+                ->with('error', 'Akun PIC tidak dapat dihapus karena masih bertanggung jawab atas satu atau lebih ruangan. Pindahkan tanggung jawab ruangannya terlebih dahulu.');
         }
-
-        $user->delete();
-
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Pengguna berhasil dihapus.');
     }
+
+    $user->delete();
+
+    return redirect()
+        ->route('users.index')
+        ->with('success', 'Pengguna berhasil dihapus.');
+}
+
 }

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,7 +13,6 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     @stack('styles')
-
 </head>
 
 <body>
@@ -20,12 +20,15 @@
 <div class="app-wrapper">
 
     {{-- SIDEBAR ADMIN --}}
-    <aside class="sidebar shadow-sm">
+    <aside class="sidebar shadow-sm" id="adminSidebar">
 
         <div class="sidebar-brand">
-            <i class="bi bi-building-fill-gear"></i>
-            RAPI Sekolah
-        </div>
+    <img src="{{ asset('images/logo-smkn1-bantul.png') }}"
+         alt="Logo SMKN 1 Bantul"
+         class="school-logo">
+
+    <span>RAPI Sekolah</span>
+</div>
 
         <nav class="sidebar-menu">
 
@@ -59,6 +62,12 @@
                 Peminjaman
             </a>
 
+            <a href="{{ route('events.move-room.index') }}"
+                class="nav-link {{ request()->routeIs('events.move-room.*') ? 'active' : '' }}">
+                <i class="bi bi-arrow-left-right"></i>
+                Pindahkan Ruangan
+            </a>
+
             <a href="{{ route('complaints.index', [], false) }}"
                class="nav-link {{ request()->routeIs('complaints.index', 'complaints.create', 'complaints.edit') ? 'active' : '' }}">
                 <i class="bi bi-exclamation-triangle"></i>
@@ -87,20 +96,34 @@
 
     </aside>
 
+    {{-- OVERLAY SIDEBAR MOBILE --}}
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     {{-- KONTEN UTAMA --}}
     <div class="main-content">
 
         {{-- TOPBAR --}}
         <header class="topbar shadow-sm">
 
-            <div>
-                <h5 class="mb-0 fw-semibold fs-6">
-                    @yield('page_title', 'Halaman Admin')
-                </h5>
+            <div class="d-flex align-items-center gap-3">
 
-                <small class="text-muted">
-                    @yield('page_subtitle', 'Panel Kontrol Administrator')
-                </small>
+                <button type="button"
+                        class="sidebar-toggle"
+                        id="sidebarToggle"
+                        aria-label="Buka menu">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div>
+                    <h5 class="mb-0 fw-semibold fs-6">
+                        @yield('page_title', 'Halaman Admin')
+                    </h5>
+
+                    <small class="text-muted">
+                        @yield('page_subtitle', 'Panel Kontrol Administrator')
+                    </small>
+                </div>
+
             </div>
 
             <div class="text-end">
@@ -125,6 +148,49 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{{-- SIDEBAR MOBILE --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('adminSidebar');
+    const toggle = document.getElementById('sidebarToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (!sidebar || !toggle || !overlay) return;
+
+    function openSidebar() {
+        sidebar.classList.add('show');
+        overlay.classList.add('show');
+        document.body.classList.add('sidebar-open');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+        document.body.classList.remove('sidebar-open');
+    }
+
+    toggle.addEventListener('click', function () {
+        sidebar.classList.contains('show')
+            ? closeSidebar()
+            : openSidebar();
+    });
+
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+
+    sidebar.querySelectorAll('.nav-link').forEach(function (link) {
+        link.addEventListener('click', closeSidebar);
+    });
+
+});
+</script>
 
 @stack('scripts')
 

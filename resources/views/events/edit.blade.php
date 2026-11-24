@@ -117,18 +117,30 @@
                                 @endforeach
                             </select>
                         </div>
+                        
+<div class="mb-3">
+    <label for="move_reason" class="form-label fw-semibold">
+        Alasan Pemindahan Ruangan
+    </label>
 
-                        <div class="mb-4">
-                            <label for="move_reason" class="form-label fw-semibold">
-                                Alasan Pemindahan Ruangan
-                            </label>
+    <textarea name="move_reason"
+              id="move_reason"
+              rows="2"
+              class="form-control"
+              placeholder="Tuliskan alasan pemindahan ruangan">{{ old('move_reason', $event->move_reason) }}</textarea>
+</div>
 
-                            <textarea name="move_reason"
-                                      id="move_reason"
-                                      rows="2"
-                                      class="form-control"
-                                      placeholder="Isi jika ruangan dipindahkan">{{ old('move_reason', $event->move_reason) }}</textarea>
-                        </div>
+{{-- Tombol khusus pemindahan ruangan --}}
+<div class="mb-4">
+    <button type="submit"
+            name="action"
+            value="move_room"
+            class="btn btn-success">
+        <i class="bi bi-arrow-left-right me-1"></i>
+        Pindahkan Ruangan
+    </button>
+</div>
+
 
                         {{-- Keputusan --}}
                         <div class="mb-3">
@@ -165,9 +177,12 @@
                                 Kembali
                             </a>
 
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Simpan Keputusan
-                            </button>
+                            <button type="submit"
+        name="action"
+        value="decision"
+        class="btn btn-primary">
+    <i class="bi bi-save"></i> Simpan Keputusan
+</button>
                         </div>
                     </form>
                 @else

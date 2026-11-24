@@ -38,10 +38,47 @@
     @endif
 </div>
 
+{{-- Pesan berhasil --}}
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show">
         {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show">
+        {{ session('error') }}
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+{{-- Notifikasi WhatsApp setelah pemindahan ruangan --}}
+@if($isAdminOrWaka && session('whatsapp_url'))
+    <div class="alert alert-info">
+        <div class="fw-semibold mb-2">
+            <i class="bi bi-whatsapp me-1"></i>
+            Pemberitahuan Pemindahan Ruangan
+        </div>
+
+        <p class="mb-3">
+            Ruangan berhasil dipindahkan. Silakan kirim pemberitahuan
+            kepada pemohon melalui WhatsApp.
+        </p>
+
+        <a href="{{ session('whatsapp_url') }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn btn-success btn-sm">
+            <i class="bi bi-whatsapp me-1"></i>
+            Kirim Notifikasi WhatsApp
+        </a>
     </div>
 @endif
 
@@ -69,7 +106,9 @@
                 <tbody>
                     @forelse($events as $index => $event)
                         <tr>
-                            <td class="ps-3">{{ $index + 1 }}</td>
+                            <td class="ps-3">
+                                {{ $index + 1 }}
+                            </td>
 
                             <td class="fw-medium">
                                 {{ $event->event_name }}
@@ -91,11 +130,17 @@
 
                             <td>
                                 @if($event->status === 'Disetujui')
-                                    <span class="badge bg-success">Disetujui</span>
+                                    <span class="badge bg-success">
+                                        Disetujui
+                                    </span>
                                 @elseif($event->status === 'Ditolak')
-                                    <span class="badge bg-danger">Ditolak</span>
+                                    <span class="badge bg-danger">
+                                        Ditolak
+                                    </span>
                                 @else
-                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
                                 @endif
                             </td>
 
